@@ -22,6 +22,11 @@ const mainNavItems: NavItem[] = [
         href: dashboard(),
         icon: LayoutGrid,
     },
+    {
+        title: 'Siswa Management',
+        href: '/students',
+        icon: Folder,
+    },
 ];
 
 const footerNavItems: NavItem[] = [
