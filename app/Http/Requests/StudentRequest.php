@@ -19,9 +19,8 @@ class StudentRequest extends FormRequest
             'nisn' => [
                 'required',
                 'digits:10',
-                Rule::unique('students', 'nisn')->ignore(
-                    $this->route('student')->id
-                ),
+                Rule::unique('students', 'nisn')
+                    ->ignore($this->student),
             ],
             'jenis_kelamin' => 'required|in:L,P',
             'tanggal_lahir' => 'required|date|before:today',

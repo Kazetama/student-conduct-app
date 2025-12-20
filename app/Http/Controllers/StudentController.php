@@ -25,7 +25,7 @@ class StudentController extends Controller
             ->paginate(10)
             ->withQueryString();
 
-        return Inertia::render('Students/Index', [
+        return Inertia::render('admin/students/index', [
             'students' => $students,
             'filters'  => $request->only(['kelas', 'rombel']),
         ]);
@@ -36,7 +36,7 @@ class StudentController extends Controller
      */
     public function create()
     {
-        return Inertia::render('Students/Create');
+        return Inertia::render('admin/students/create');
     }
 
     /**
@@ -56,7 +56,7 @@ class StudentController extends Controller
      */
     public function edit(Student $student)
     {
-        return Inertia::render('Students/Edit', [
+        return Inertia::render('admin/students/edit', [
             'student' => $student,
         ]);
     }

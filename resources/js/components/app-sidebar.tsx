@@ -24,7 +24,7 @@ const mainNavItems: NavItem[] = [
     },
     {
         title: 'Siswa Management',
-        href: '/students',
+        href: '/admin/students',
         icon: Folder,
     },
 ];

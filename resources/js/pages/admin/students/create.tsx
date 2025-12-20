@@ -15,7 +15,7 @@ export default function Create() {
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
-        post('/students', {
+        post('/admin/students', {
             preserveScroll: true,
         });
     };
@@ -24,8 +24,8 @@ export default function Create() {
         <AppLayout
             breadcrumbs={[
                 { title: 'Dashboard', href: '/' },
-                { title: 'Students', href: '/students' },
-                { title: 'Create', href: '/students/create' },
+                { title: 'Students', href: '/admin/students' },
+                { title: 'Create', href: '/admin/students/create' },
             ]}
         >
             <Head title="Tambah Siswa" />

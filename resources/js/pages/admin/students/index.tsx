@@ -19,7 +19,7 @@ export default function Index({ students }: Props) {
         <AppLayout
             breadcrumbs={[
                 { title: 'Dashboard', href: '/' },
-                { title: 'Students', href: '/students' },
+                { title: 'Students', href: '/admin/students' },
             ]}
         >
             <Head title="Students" />
@@ -28,7 +28,7 @@ export default function Index({ students }: Props) {
                 <div className="flex justify-between items-center">
                     <h1 className="text-xl font-semibold">Data Siswa</h1>
                     <Link
-                        href="/students/create"
+                        href="/admin/students/create"
                         className="rounded bg-primary px-4 py-2 text-white"
                     >
                         Tambah Siswa
@@ -57,7 +57,7 @@ export default function Index({ students }: Props) {
                                     <td className="p-2 text-center">{s.total_poin}</td>
                                     <td className="p-2 flex gap-2 justify-center">
                                         <Link
-                                            href={`/students/${s.id}/edit`}
+                                            href={`/admin/students/${s.id}/edit`}
                                             className="text-blue-600"
                                         >
                                             Edit

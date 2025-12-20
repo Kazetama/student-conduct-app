@@ -22,7 +22,7 @@ export default function Edit({ student }: Props) {
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
-        put(`/students/${student.id}`, {
+        put(`/admin/students/${student.id}`, {
             preserveScroll: true,
         });
     };
@@ -31,8 +31,8 @@ export default function Edit({ student }: Props) {
         <AppLayout
             breadcrumbs={[
                 { title: 'Dashboard', href: '/' },
-                { title: 'Students', href: '/students' },
-                { title: 'Edit', href: `/students/${student.id}/edit` },
+                { title: 'Students', href: '/admin/students' },
+                { title: 'Edit', href: `/admin/students/${student.id}/edit` },
             ]}
         >
             <Head title="Edit Siswa" />
