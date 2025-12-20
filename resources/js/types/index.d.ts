@@ -41,3 +41,17 @@ export interface User {
     updated_at: string;
     [key: string]: unknown; // This allows for additional properties...
 }
+
+interface Student {
+    id: number;
+    nama_lengkap: string;
+    nisn: string;
+    jenis_kelamin: 'L' | 'P';
+    tanggal_lahir: string;
+    kelas: string;
+    rombel: string;
+    total_poin: number;
+    tahun_ajaran: string;
+    no_hp?: string;
+    is_active: boolean;
+}
