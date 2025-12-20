@@ -1,5 +1,17 @@
+import React from 'react';
 import AppLayout from '@/layouts/app-layout';
-import { Head, useForm } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
+
+// Shadcn UI Components
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Separator } from '@/components/ui/separator';
+
+// Icons
+import { ChevronLeft, Save } from 'lucide-react';
 
 export default function Create() {
     const { data, setData, post, processing, errors } = useForm({
@@ -30,91 +42,173 @@ export default function Create() {
         >
             <Head title="Tambah Siswa" />
 
-            <div className="p-4 max-w-xl space-y-4">
+            <div className="container mx-auto p-3">
+                <form onSubmit={submit}>
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Tambah Siswa Baru</CardTitle>
+                            <CardDescription>
+                                Masukkan informasi lengkap siswa baru untuk ditambahkan ke sistem.
+                            </CardDescription>
+                        </CardHeader>
 
-                {Object.keys(errors).length > 0 && (
-                    <div className="rounded-md bg-red-100 p-3 text-sm text-red-700">
-                        <ul className="list-disc pl-4">
-                            {Object.values(errors).map((err, i) => (
-                                <li key={i}>{err}</li>
-                            ))}
-                        </ul>
-                    </div>
-                )}
+                        <CardContent className="space-y-6">
+                            {/* BAGIAN 1: DATA PRIBADI */}
+                            <div>
+                                <h3 className="text-sm font-medium text-muted-foreground mb-4 uppercase tracking-wider">
+                                    Data Pribadi
+                                </h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {/* Nama Lengkap */}
+                                    <div className="space-y-2">
+                                        <Label htmlFor="nama_lengkap">Nama Lengkap <span className="text-red-500">*</span></Label>
+                                        <Input
+                                            id="nama_lengkap"
+                                            placeholder="Contoh: Ahmad Fauzi"
+                                            value={data.nama_lengkap}
+                                            onChange={(e) => setData('nama_lengkap', e.target.value)}
+                                            className={errors.nama_lengkap ? "border-red-500" : ""}
+                                        />
+                                        {errors.nama_lengkap && <p className="text-xs text-red-500">{errors.nama_lengkap}</p>}
+                                    </div>
 
-                <form onSubmit={submit} className="space-y-4">
+                                    {/* NISN */}
+                                    <div className="space-y-2">
+                                        <Label htmlFor="nisn">NISN <span className="text-red-500">*</span></Label>
+                                        <Input
+                                            id="nisn"
+                                            placeholder="10 digit nomor NISN"
+                                            value={data.nisn}
+                                            onChange={(e) => setData('nisn', e.target.value)}
+                                            maxLength={10}
+                                            className={errors.nisn ? "border-red-500" : ""}
+                                        />
+                                        {errors.nisn && <p className="text-xs text-red-500">{errors.nisn}</p>}
+                                    </div>
 
-                    <input
-                        className="input w-full"
-                        placeholder="Nama Lengkap"
-                        value={data.nama_lengkap}
-                        onChange={(e) => setData('nama_lengkap', e.target.value)}
-                        required
-                    />
+                                    {/* Jenis Kelamin */}
+                                    <div className="space-y-2">
+                                        <Label>Jenis Kelamin</Label>
+                                        <Select
+                                            value={data.jenis_kelamin}
+                                            onValueChange={(val) => setData('jenis_kelamin', val)}
+                                        >
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Pilih jenis kelamin" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="L">Laki-laki</SelectItem>
+                                                <SelectItem value="P">Perempuan</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                        {errors.jenis_kelamin && <p className="text-xs text-red-500">{errors.jenis_kelamin}</p>}
+                                    </div>
 
-                    <input
-                        className="input w-full"
-                        placeholder="NISN (10 digit)"
-                        value={data.nisn}
-                        onChange={(e) => setData('nisn', e.target.value)}
-                        required
-                    />
+                                    {/* Tanggal Lahir */}
+                                    <div className="space-y-2">
+                                        <Label htmlFor="tanggal_lahir">Tanggal Lahir <span className="text-red-500">*</span></Label>
+                                        <Input
+                                            id="tanggal_lahir"
+                                            type="date"
+                                            value={data.tanggal_lahir}
+                                            onChange={(e) => setData('tanggal_lahir', e.target.value)}
+                                            className={errors.tanggal_lahir ? "border-red-500 block" : "block"}
+                                        />
+                                        {errors.tanggal_lahir && <p className="text-xs text-red-500">{errors.tanggal_lahir}</p>}
+                                    </div>
+                                </div>
+                            </div>
 
-                    <select
-                        className="input w-full"
-                        value={data.jenis_kelamin}
-                        onChange={(e) => setData('jenis_kelamin', e.target.value)}
-                    >
-                        <option value="L">Laki-laki</option>
-                        <option value="P">Perempuan</option>
-                    </select>
+                            <Separator />
 
-                    <input
-                        type="date"
-                        className="input w-full"
-                        value={data.tanggal_lahir}
-                        onChange={(e) => setData('tanggal_lahir', e.target.value)}
-                        required
-                    />
+                            {/* BAGIAN 2: DATA AKADEMIK */}
+                            <div>
+                                <h3 className="text-sm font-medium text-muted-foreground mb-4 uppercase tracking-wider">
+                                    Data Akademik & Kontak
+                                </h3>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                    {/* Kelas */}
+                                    <div className="space-y-2">
+                                        <Label htmlFor="kelas">Kelas <span className="text-red-500">*</span></Label>
+                                        <Select
+                                            value={data.kelas}
+                                            onValueChange={(val) => setData('kelas', val)}
+                                        >
+                                            <SelectTrigger className={errors.kelas ? "border-red-500" : ""}>
+                                                <SelectValue placeholder="Pilih Kelas" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="VII">Kelas VII (7)</SelectItem>
+                                                <SelectItem value="VIII">Kelas VIII (8)</SelectItem>
+                                                <SelectItem value="IX">Kelas IX (9)</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                        {errors.kelas && <p className="text-xs text-red-500">{errors.kelas}</p>}
+                                    </div>
 
-                    <input
-                        className="input w-full"
-                        placeholder="Kelas (VII / VIII / IX)"
-                        value={data.kelas}
-                        onChange={(e) => setData('kelas', e.target.value)}
-                        required
-                    />
+                                    {/* Rombel */}
+                                    <div className="space-y-2">
+                                        <Label htmlFor="rombel">Rombel <span className="text-red-500">*</span></Label>
+                                        <Input
+                                            id="rombel"
+                                            placeholder="Contoh: A, B, atau Unggulan"
+                                            value={data.rombel}
+                                            onChange={(e) => setData('rombel', e.target.value)}
+                                            className={errors.rombel ? "border-red-500" : ""}
+                                        />
+                                        {errors.rombel && <p className="text-xs text-red-500">{errors.rombel}</p>}
+                                    </div>
 
-                    <input
-                        className="input w-full"
-                        placeholder="Rombel (A / B)"
-                        value={data.rombel}
-                        onChange={(e) => setData('rombel', e.target.value)}
-                        required
-                    />
+                                    {/* Tahun Ajaran */}
+                                    <div className="space-y-2">
+                                        <Label htmlFor="tahun_ajaran">Tahun Ajaran</Label>
+                                        <Input
+                                            id="tahun_ajaran"
+                                            value={data.tahun_ajaran}
+                                            onChange={(e) => setData('tahun_ajaran', e.target.value)}
+                                            placeholder="2024/2025"
+                                        />
+                                    </div>
+                                </div>
 
-                    <input
-                        className="input w-full"
-                        placeholder="Tahun Ajaran"
-                        value={data.tahun_ajaran}
-                        onChange={(e) => setData('tahun_ajaran', e.target.value)}
-                        required
-                    />
+                                <div className="mt-6">
+                                    {/* No HP */}
+                                    <div className="space-y-2 max-w-md">
+                                        <Label htmlFor="no_hp">Nomor HP / WhatsApp (Opsional)</Label>
+                                        <Input
+                                            id="no_hp"
+                                            type="tel"
+                                            placeholder="08xxxxxxxxxx"
+                                            value={data.no_hp}
+                                            onChange={(e) => setData('no_hp', e.target.value)}
+                                        />
+                                        <p className="text-[0.8rem] text-muted-foreground">
+                                            Digunakan untuk notifikasi pelanggaran ke orang tua/siswa.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </CardContent>
 
-                    <input
-                        className="input w-full"
-                        placeholder="No HP (opsional)"
-                        value={data.no_hp}
-                        onChange={(e) => setData('no_hp', e.target.value)}
-                    />
-
-                    <button
-                        type="submit"
-                        disabled={processing}
-                        className="rounded bg-primary px-4 py-2 text-white disabled:opacity-50"
-                    >
-                        {processing ? 'Menyimpan...' : 'Simpan'}
-                    </button>
+                        <CardFooter className="flex justify-between border-t p-6 bg-muted/20">
+                            <Button variant="outline" asChild>
+                                <Link href="/admin/students">
+                                    <ChevronLeft className="mr-2 h-4 w-4" />
+                                    Kembali
+                                </Link>
+                            </Button>
+                            <Button type="submit" disabled={processing} className="min-w-[120px]">
+                                {processing ? (
+                                    'Menyimpan...'
+                                ) : (
+                                    <>
+                                        <Save className="mr-2 h-4 w-4" />
+                                        Simpan Data
+                                    </>
+                                )}
+                            </Button>
+                        </CardFooter>
+                    </Card>
                 </form>
             </div>
         </AppLayout>
