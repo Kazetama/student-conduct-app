@@ -55,3 +55,13 @@ interface Student {
     no_hp?: string;
     is_active: boolean;
 }
+
+
+interface PointRule {
+    id: number;
+    nama: string;
+    type: 'reward' | 'penalty';
+    kategori: string;
+    point: number;
+    is_active: boolean;
+}

@@ -27,6 +27,11 @@ const mainNavItems: NavItem[] = [
         href: '/admin/students',
         icon: Folder,
     },
+    {
+        title: 'Aturan Poin',
+        href: '/admin/point-rules',
+        icon: BookOpen,
+    }
 ];
 
 const footerNavItems: NavItem[] = [
