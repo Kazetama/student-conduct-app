@@ -31,7 +31,12 @@ const mainNavItems: NavItem[] = [
         title: 'Aturan Poin',
         href: '/admin/point-rules',
         icon: BookOpen,
-    }
+    },
+    {
+        title: 'Pemberian Poin',
+        href: '/admin/student-points/create',
+        icon: Folder,
+    },
 ];
 
 const footerNavItems: NavItem[] = [

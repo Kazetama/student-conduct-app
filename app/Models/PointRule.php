@@ -14,4 +14,14 @@ class PointRule extends Model
         'max_per_period',
         'is_active',
     ];
+
+    public function pointHistories()
+    {
+        return $this->hasMany(StudentPoint::class);
+    }
+
+    public function recalculateTotalPoint(): int
+    {
+        return $this->pointHistories()->sum('point');
+    }
 }

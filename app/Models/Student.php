@@ -43,4 +43,9 @@ class Student extends Authenticatable
     {
         return null;
     }
+
+    public function studentPoints()
+    {
+        return $this->hasMany(StudentPoint::class);
+    }
 }
