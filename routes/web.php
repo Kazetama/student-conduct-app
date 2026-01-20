@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\PointRuleController;
 use App\Http\Controllers\Admin\StudentPointController;
 use App\Http\Controllers\StudentController;
@@ -14,10 +15,8 @@ Route::get('/', function () {
 })->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
-    })->name('dashboard');
-
+    Route::get('dashboard', [DashboardController::class, 'index'])
+        ->name('dashboard');
     Route::resource('admin/students', StudentController::class);
 });
 
