@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
 
-import { ChevronLeft, Save, Search, CheckCircle2, User, X } from 'lucide-react';
+import { ChevronLeft, Save, Search, CheckCircle2, X } from 'lucide-react';
 
 interface Student {
     id: number;
@@ -39,7 +39,16 @@ export default function Create({ students, rules }: {
 
     const { flash } = usePage<{ flash?: { success?: string } }>().props;
 
-    const [toast, setToast] = useState<string | null>(null);
+    // Use derived state instead of setting state in effect
+    const [toastVisible, setToastVisible] = useState(false);
+
+    useEffect(() => {
+        if (flash?.success) {
+            setToastVisible(true);
+            const timer = setTimeout(() => setToastVisible(false), 4000);
+            return () => clearTimeout(timer);
+        }
+    }, [flash?.success]);
 
     const [query, setQuery] = useState('');
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -50,14 +59,6 @@ export default function Create({ students, rules }: {
         tanggal: new Date().toISOString().split('T')[0],
         keterangan: '',
     });
-
-    useEffect(() => {
-        if (flash?.success) {
-            setToast(flash.success);
-            const timer = setTimeout(() => setToast(null), 4000);
-            return () => clearTimeout(timer);
-        }
-    }, [flash]);
 
     const filteredStudents = students.filter((s) =>
         s.nama_lengkap.toLowerCase().includes(query.toLowerCase()) ||
@@ -86,12 +87,12 @@ export default function Create({ students, rules }: {
             <Head title="Input Poin Siswa" />
 
             {/* TOAST NOTIFICATION */}
-            {toast && (
+            {toastVisible && flash?.success && (
                 <div className="fixed top-4 right-4 z-50 animate-in fade-in slide-in-from-top-5 duration-300">
                     <div className="flex items-center gap-3 rounded-lg bg-green-600 px-4 py-3 text-white shadow-xl">
                         <CheckCircle2 className="h-5 w-5" />
-                        <span className="font-medium">{toast}</span>
-                        <button onClick={() => setToast(null)} className="ml-2 text-green-100 hover:text-white">
+                        <span className="font-medium">{flash.success}</span>
+                        <button onClick={() => setToastVisible(false)} className="ml-2 text-green-100 hover:text-white">
                             <X className="h-4 w-4" />
                         </button>
                     </div>
@@ -123,7 +124,6 @@ export default function Create({ students, rules }: {
                                         onChange={(e) => {
                                             setQuery(e.target.value);
                                             setIsDropdownOpen(true);
-                                            // Reset ID jika user mengetik ulang
                                             if (e.target.value === '') setData('student_id', '');
                                         }}
                                         onFocus={() => setIsDropdownOpen(true)}
