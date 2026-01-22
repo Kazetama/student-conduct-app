@@ -32,8 +32,23 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
         'student-points',
         [StudentPointController::class, 'store']
     )->name('student-points.store');
-
 });
+
+use App\Services\FonnteService;
+
+Route::get('/test-fonnte', function (FonnteService $fonnte) {
+
+    $success = $fonnte->send(
+        '6285732198202', // GANTI nomor kamu (format 62)
+        'Halo 👋 ini TEST WhatsApp dari Laravel Student Conduct App'
+    );
+
+    return response()->json([
+        'success' => $success
+    ]);
+});
+
+
 
 require __DIR__.'/settings.php';
 require __DIR__.'/student.php';
