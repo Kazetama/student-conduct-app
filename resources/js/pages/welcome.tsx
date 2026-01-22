@@ -1,6 +1,6 @@
 import { Head } from '@inertiajs/react';
-import Navbar from '@/components/navbar';
-import Hero from '@/components/hero';
+import Navbar from '@/components/organisms/navbar';
+import Hero from '@/components/organisms/hero';
 
 export default function Welcome() {
     return (
