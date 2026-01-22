@@ -6,13 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Models\PointRule;
 use App\Models\Student;
 use App\Models\StudentPoint;
+use App\Services\FonnteService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class StudentPointController extends Controller
 {
-
     public function create()
     {
         return Inertia::render('admin/student-points/create', [
@@ -38,8 +38,11 @@ class StudentPointController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(Request $request, FonnteService $fonnte)
     {
+        // ===============================
+        // LOGIC LAMA (TIDAK DIUBAH)
+        // ===============================
         $validated = $request->validate([
             'student_id' => 'required|exists:students,id',
             'point_rule_id' => 'required|exists:point_rules,id',
@@ -88,6 +91,30 @@ class StudentPointController extends Controller
 
         $student->save();
 
+        // ===============================
+        // 🔔 FITUR BARU: NOTIF WA SP 1
+        // RULE: total_poin < 75
+        // ===============================
+        if ($student->total_poin < 75 && !empty($student->no_hp)) {
+
+            $message = "Yth. Orang Tua/Wali dari {$student->nama_lengkap},
+
+Kami informasikan bahwa siswa tersebut telah melakukan pelanggaran tata tertib sekolah.
+
+Total poin pelanggaran saat ini: *{$student->total_poin} poin*.
+Siswa dikenakan *Surat Peringatan 1 (SP 1)*.
+
+Mohon perhatian dan kerja sama orang tua untuk pembinaan lebih lanjut.
+
+Terima kasih.
+— BK / Manajemen Sekolah";
+
+            $fonnte->send($student->no_hp, $message);
+        }
+
+        // ===============================
+        // REDIRECT (LOGIC LAMA)
+        // ===============================
         return redirect()
             ->route('admin.student-points.create')
             ->with(
