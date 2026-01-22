@@ -7,9 +7,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-
-// PERBAIKAN DISINI: Import dari 'ui/alert', bukan 'ui/alert-dialog'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Progress } from '@/components/ui/progress'; // Pastikan component Progress sudah diinstall
 
 // Icons
 import {
@@ -18,9 +17,11 @@ import {
     Calendar,
     School,
     Hash,
-    ShieldAlert,
+    ShieldCheck,
+    AlertTriangle,
+    Siren,
     BookOpen,
-    Trophy
+    CreditCard
 } from 'lucide-react';
 
 type Student = {
@@ -40,183 +41,231 @@ type Props = {
 };
 
 export default function Dashboard({ student }: Props) {
+
+    // --- Logic Helper ---
     function logout() {
         router.post('/student/logout');
     }
 
     const getInitials = (name: string) => {
-        return name
-            .split(' ')
-            .map((n) => n[0])
-            .slice(0, 2)
-            .join('')
-            .toUpperCase();
+        return name.split(' ').map((n) => n[0]).slice(0, 2).join('').toUpperCase();
     };
 
     const formatDate = (dateString: string) => {
         return new Date(dateString).toLocaleDateString('id-ID', {
-            day: 'numeric',
-            month: 'long',
-            year: 'numeric',
+            day: 'numeric', month: 'long', year: 'numeric',
         });
     };
 
-    const isPointSafe = student.total_poin >= 50;
+    // Logika Warna & Status Poin
+    const getPointStatus = (poin: number) => {
+        if (poin >= 90) return { label: 'Sangat Baik', color: 'text-green-600', bg: 'bg-green-600', border: 'border-green-200', icon: ShieldCheck, desc: 'Pertahankan prestasi ini!' };
+        if (poin >= 50) return { label: 'Perlu Perhatian', color: 'text-yellow-600', bg: 'bg-yellow-500', border: 'border-yellow-200', icon: AlertTriangle, desc: 'Hati-hati, poin mulai menurun.' };
+        return { label: 'Bahaya', color: 'text-red-600', bg: 'bg-red-600', border: 'border-red-200', icon: Siren, desc: 'Segera hubungi BK/Wali Kelas.' };
+    };
+
+    const pointStatus = getPointStatus(student.total_poin);
+    const StatusIcon = pointStatus.icon;
 
     return (
-        <div className="min-h-screen bg-muted/20">
+        <div className="min-h-screen bg-gray-50/50">
             <Head title="Dashboard Siswa" />
 
-            <nav className="bg-background border-b px-6 py-4 flex justify-between items-center sticky top-0 z-10 shadow-sm">
-                <div className="flex items-center gap-2 font-semibold text-lg">
-                    <div className="bg-primary text-primary-foreground p-1.5 rounded-md">
-                        <School className="h-5 w-5" />
+            {/* === HEADER === */}
+            <nav className="bg-white border-b px-6 py-4 sticky top-0 z-20 shadow-sm">
+                <div className="container mx-auto max-w-6xl flex justify-between items-center">
+                    <div className="flex items-center gap-3">
+                        <div className="bg-primary/10 p-2 rounded-lg text-primary">
+                            <School className="h-6 w-6" />
+                        </div>
+                        <div className="flex flex-col">
+                            <span className="font-bold text-lg tracking-tight leading-none">Portal Siswa</span>
+                            <span className="text-xs text-muted-foreground">Monitoring Akademik</span>
+                        </div>
                     </div>
-                    <span className="hidden sm:inline">Portal Siswa</span>
+                    <Button
+                        variant="ghost"
+                        onClick={logout}
+                        className="text-muted-foreground hover:text-red-600 hover:bg-red-50 gap-2"
+                    >
+                        <LogOut className="h-4 w-4" />
+                        <span className="hidden sm:inline">Keluar</span>
+                    </Button>
                 </div>
-                <Button
-                    variant="ghost"
-                    onClick={logout}
-                    className="text-muted-foreground hover:text-red-600 hover:bg-red-50"
-                >
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Logout
-                </Button>
             </nav>
 
-            <main className="container mx-auto p-4 md:p-8 max-w-5xl space-y-6">
+            <main className="container mx-auto max-w-6xl p-4 md:p-8 space-y-8">
 
-                <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+                {/* === WELCOME SECTION === */}
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
-                        <h1 className="text-3xl font-bold tracking-tight text-foreground">
-                            Halo, {student.nama_lengkap.split(' ')[0]}! 👋
+                        <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+                            Selamat Datang, {student.nama_lengkap.split(' ')[0]}! 👋
                         </h1>
-                        <p className="text-muted-foreground">
-                            Selamat datang di dashboard monitoring siswa.
+                        <p className="text-muted-foreground mt-1">
+                            Berikut adalah ringkasan data akademik dan kedisiplinan Anda.
                         </p>
                     </div>
-                    <Badge variant={student.is_active ? "default" : "destructive"} className="px-3 py-1 text-sm">
-                        {student.is_active ? "Status: Aktif" : "Status: Non-Aktif"}
-                    </Badge>
+                    {!student.is_active && (
+                        <Badge variant="destructive" className="px-4 py-1.5 text-sm uppercase tracking-wider">
+                            Status: Non-Aktif
+                        </Badge>
+                    )}
                 </div>
 
-                {/* PERBAIKAN DISINI: Menggunakan komponen Alert Shadcn yang benar */}
+                {/* === ALERT JIKA NON-AKTIF === */}
                 {!student.is_active && (
-                    <Alert variant="destructive">
-                        <ShieldAlert className="h-4 w-4" />
-                        <AlertTitle>Akun Dibekukan</AlertTitle>
+                    <Alert variant="destructive" className="bg-red-50 border-red-200 text-red-900">
+                        <Siren className="h-4 w-4" />
+                        <AlertTitle>Perhatian</AlertTitle>
                         <AlertDescription>
-                            Akun anda saat ini berstatus tidak aktif. Silakan hubungi tata usaha jika ini adalah kesalahan.
+                            Status siswa Anda saat ini <b>Non-Aktif</b>. Akses ke beberapa fitur mungkin dibatasi. Silakan hubungi Tata Usaha sekolah.
                         </AlertDescription>
                     </Alert>
                 )}
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* === MAIN GRID === */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-                    {/* KOLOM KIRI: Profile Card */}
-                    <Card className="md:col-span-2 shadow-sm">
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2">
-                                <User className="h-5 w-5 text-primary" />
-                                Informasi Pribadi
+                    {/* === KARTU 1: STATUS POIN (Hero Card) === */}
+                    <Card className={`lg:col-span-1 shadow-md border-t-4 ${pointStatus.border} overflow-hidden relative`}>
+                        {/* Background Decoration */}
+                        <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 rounded-full bg-muted/10 blur-xl" />
+
+                        <CardHeader className="pb-2">
+                            <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+                                Kredit Poin Siswa
                             </CardTitle>
-                            <CardDescription>Detail data diri dan akademik siswa.</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-6">
-
-                            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 mb-6 p-4 bg-muted/30 rounded-lg border">
-                                <Avatar className="h-20 w-20 border-4 border-background shadow-sm">
-                                    <AvatarFallback className="bg-primary text-primary-foreground text-2xl font-bold">
-                                        {getInitials(student.nama_lengkap)}
-                                    </AvatarFallback>
-                                </Avatar>
-                                <div className="text-center sm:text-left space-y-1">
-                                    <h2 className="text-xl font-bold">{student.nama_lengkap}</h2>
-                                    <p className="text-sm text-muted-foreground font-mono bg-muted px-2 py-0.5 rounded inline-block">
-                                        NISN: {student.nisn}
-                                    </p>
-                                    <div className="flex items-center justify-center sm:justify-start gap-2 text-sm text-muted-foreground pt-1">
-                                        <School className="h-3 w-3" />
-                                        <span>Kelas {student.kelas} - {student.rombel}</span>
-                                    </div>
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <span className={`text-5xl font-extrabold ${pointStatus.color}`}>
+                                        {student.total_poin}
+                                    </span>
+                                    <span className="text-sm text-muted-foreground ml-1">/ 100</span>
+                                </div>
+                                <div className={`p-3 rounded-full ${pointStatus.bg} bg-opacity-10`}>
+                                    <StatusIcon className={`h-8 w-8 ${pointStatus.color}`} />
                                 </div>
                             </div>
 
-                            <Separator />
-
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-8">
-                                <div className="space-y-1">
-                                    <label className="text-xs font-medium text-muted-foreground uppercase flex items-center gap-1">
-                                        <Hash className="h-3 w-3" /> Jenis Kelamin
-                                    </label>
-                                    <p className="font-medium">
-                                        {student.jenis_kelamin === 'L' ? 'Laki-laki' : 'Perempuan'}
-                                    </p>
+                            <div className="space-y-2">
+                                <div className="flex justify-between text-sm font-medium">
+                                    <span>Status Kondisi</span>
+                                    <span className={pointStatus.color}>{pointStatus.label}</span>
                                 </div>
-
-                                <div className="space-y-1">
-                                    <label className="text-xs font-medium text-muted-foreground uppercase flex items-center gap-1">
-                                        <Calendar className="h-3 w-3" /> Tanggal Lahir
-                                    </label>
-                                    <p className="font-medium">
-                                        {formatDate(student.tanggal_lahir)}
-                                    </p>
-                                </div>
-
-                                <div className="space-y-1">
-                                    <label className="text-xs font-medium text-muted-foreground uppercase flex items-center gap-1">
-                                        <BookOpen className="h-3 w-3" /> Tahun Ajaran
-                                    </label>
-                                    <p className="font-medium">
-                                        {student.tahun_ajaran}
-                                    </p>
-                                </div>
-                            </div>
-
-                        </CardContent>
-                    </Card>
-
-                    {/* KOLOM KANAN: Score Card */}
-                    <Card className="shadow-sm h-fit">
-                        <CardHeader className="bg-muted/10 border-b">
-                            <CardTitle className="flex items-center gap-2 text-lg">
-                                <Trophy className="h-5 w-5 text-yellow-600" />
-                                Poin Kedisiplinan
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="pt-8 pb-8 text-center">
-
-                            <div className={`
-                                mx-auto flex items-center justify-center
-                                w-32 h-32 rounded-full border-8
-                                ${isPointSafe ? 'border-green-100 bg-green-50' : 'border-red-100 bg-red-50'}
-                            `}>
-                                <span className={`text-4xl font-extrabold ${isPointSafe ? 'text-green-600' : 'text-red-600'}`}>
-                                    {student.total_poin}
-                                </span>
-                            </div>
-
-                            <div className="mt-4 space-y-2">
-                                <Badge variant={isPointSafe ? "secondary" : "destructive"} className="text-sm px-4 py-1">
-                                    {isPointSafe ? "Kondisi Aman" : "Perlu Perhatian"}
-                                </Badge>
-                                <p className="text-sm text-muted-foreground px-4">
-                                    {isPointSafe
-                                        ? "Pertahankan poin anda di atas ambang batas."
-                                        : "Poin anda berada di bawah batas aman. Segera hubungi BK."
-                                    }
+                                <Progress value={student.total_poin} className="h-3" />
+                                <p className="text-xs text-muted-foreground pt-1">
+                                    {pointStatus.desc}
                                 </p>
                             </div>
-
                         </CardContent>
-                        <CardFooter className="bg-muted/10 border-t p-4">
-                            <p className="text-xs text-center w-full text-muted-foreground">
-                                Terakhir diperbarui: {new Date().toLocaleDateString('id-ID')}
-                            </p>
+                        <CardFooter className="bg-gray-50 border-t py-3">
+                            <div className="flex gap-4 w-full text-xs text-muted-foreground justify-center">
+                                <div className="flex items-center gap-1">
+                                    <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                                    <span>90-100 Aman</span>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                    <div className="w-2 h-2 rounded-full bg-yellow-500"></div>
+                                    <span>50-89 Waspada</span>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                    <div className="w-2 h-2 rounded-full bg-red-500"></div>
+                                    <span>&lt;50 Bahaya</span>
+                                </div>
+                            </div>
                         </CardFooter>
                     </Card>
 
+                    {/* === KARTU 2: DIGITAL STUDENT ID (Profile) === */}
+                    <Card className="lg:col-span-2 shadow-md">
+                        <CardHeader className="border-b bg-muted/10">
+                            <div className="flex items-center gap-2">
+                                <CreditCard className="h-5 w-5 text-primary" />
+                                <CardTitle className="text-lg">Kartu Digital Pelajar</CardTitle>
+                            </div>
+                        </CardHeader>
+                        <CardContent className="p-6">
+                            <div className="flex flex-col md:flex-row gap-8 items-center md:items-start">
+
+                                {/* Foto / Avatar */}
+                                <div className="flex flex-col items-center gap-3">
+                                    <Avatar className="h-28 w-28 border-4 border-white shadow-lg">
+                                        <AvatarFallback className="bg-gradient-to-br from-primary to-blue-600 text-white text-3xl font-bold">
+                                            {getInitials(student.nama_lengkap)}
+                                        </AvatarFallback>
+                                    </Avatar>
+                                    <Badge variant="outline" className="mt-2 font-mono">
+                                        {student.nisn}
+                                    </Badge>
+                                </div>
+
+                                {/* Detail Data */}
+                                <div className="flex-1 w-full grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                                    <div className="space-y-1">
+                                        <label className="text-xs font-semibold text-muted-foreground uppercase flex items-center gap-1">
+                                            <User className="h-3 w-3" /> Nama Lengkap
+                                        </label>
+                                        <p className="font-medium text-lg text-gray-900 border-b pb-1">
+                                            {student.nama_lengkap}
+                                        </p>
+                                    </div>
+
+                                    <div className="space-y-1">
+                                        <label className="text-xs font-semibold text-muted-foreground uppercase flex items-center gap-1">
+                                            <School className="h-3 w-3" /> Kelas & Rombel
+                                        </label>
+                                        <p className="font-medium text-lg text-gray-900 border-b pb-1">
+                                            {student.kelas} - {student.rombel}
+                                        </p>
+                                    </div>
+
+                                    <div className="space-y-1">
+                                        <label className="text-xs font-semibold text-muted-foreground uppercase flex items-center gap-1">
+                                            <Calendar className="h-3 w-3" /> Tanggal Lahir
+                                        </label>
+                                        <p className="font-medium text-gray-700">
+                                            {formatDate(student.tanggal_lahir)}
+                                        </p>
+                                    </div>
+
+                                    <div className="space-y-1">
+                                        <label className="text-xs font-semibold text-muted-foreground uppercase flex items-center gap-1">
+                                            <Hash className="h-3 w-3" /> Jenis Kelamin
+                                        </label>
+                                        <p className="font-medium text-gray-700">
+                                            {student.jenis_kelamin === 'L' ? 'Laki-laki' : 'Perempuan'}
+                                        </p>
+                                    </div>
+
+                                    <div className="space-y-1 md:col-span-2">
+                                        <label className="text-xs font-semibold text-muted-foreground uppercase flex items-center gap-1">
+                                            <BookOpen className="h-3 w-3" /> Tahun Ajaran Aktif
+                                        </label>
+                                        <p className="font-medium text-gray-700 bg-muted/30 px-3 py-2 rounded-md inline-block">
+                                            {student.tahun_ajaran}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+
                 </div>
+
+                {/* === FOOTER INFO === */}
+                <div className="text-center text-sm text-muted-foreground pt-8 pb-4">
+                    <p>
+                        Jika terdapat kesalahan data, mohon segera hubungi Operator Sekolah atau Wali Kelas.
+                    </p>
+                    <p className="text-xs mt-1 opacity-70">
+                        &copy; {new Date().getFullYear()} Sistem Informasi Akademik Sekolah.
+                    </p>
+                </div>
+
             </main>
         </div>
     );
