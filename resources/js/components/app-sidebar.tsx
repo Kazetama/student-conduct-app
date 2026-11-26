@@ -1,4 +1,3 @@
-import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import {
@@ -11,55 +10,81 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
-import { type NavItem } from '@/types';
-import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid } from 'lucide-react';
+import { type NavItem, type SharedData } from '@/types';
+import { Link, usePage } from '@inertiajs/react';
+import {
+    ClipboardList,
+    Gavel,
+    History,
+    LayoutGrid,
+    Shield,
+    Users,
+} from 'lucide-react';
 import AppLogo from './app-logo';
 
-const mainNavItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        href: dashboard(),
-        icon: LayoutGrid,
-    },
-    {
-        title: 'Siswa Management',
-        href: '/admin/students',
-        icon: Folder,
-    },
-    {
-        title: 'Aturan Poin',
-        href: '/admin/point-rules',
-        icon: BookOpen,
-    },
-    {
-        title: 'Pemberian Poin',
-        href: '/admin/student-points/create',
-        icon: Folder,
-    },
-];
-
-const footerNavItems: NavItem[] = [
-    {
-        title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
-        icon: Folder,
-    },
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#react',
-        icon: BookOpen,
-    },
-];
-
 export function AppSidebar() {
+    const { auth } = usePage<SharedData>().props;
+    const roles = auth.roles ?? [];
+    const isAdmin = roles.includes('admin');
+    const isStafBk = roles.includes('staf_bk');
+
+    const homeHref = isAdmin ? dashboard() : '/bk/dashboard';
+
+    const mainNavItems: NavItem[] = isAdmin
+        ? [
+              {
+                  title: 'Dashboard Admin',
+                  href: dashboard(),
+                  icon: LayoutGrid,
+              },
+              {
+                  title: 'Manajemen User & Role',
+                  href: '/admin/users',
+                  icon: Shield,
+              },
+              {
+                  title: 'Manajemen Siswa',
+                  href: '/admin/students',
+                  icon: Users,
+              },
+              {
+                  title: 'Aturan Poin',
+                  href: '/admin/point-rules',
+                  icon: ClipboardList,
+              },
+          ]
+        : isStafBk
+          ? [
+                {
+                    title: 'Dashboard BK',
+                    href: '/bk/dashboard',
+                    icon: LayoutGrid,
+                },
+                {
+                    title: 'Input Poin Siswa',
+                    href: '/bk/student-points/create',
+                    icon: Gavel,
+                },
+                {
+                    title: 'Riwayat Poin',
+                    href: '/bk/student-points',
+                    icon: History,
+                },
+                {
+                    title: 'Monitoring Siswa',
+                    href: '/bk/students',
+                    icon: Users,
+                },
+            ]
+          : [];
+
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
-                            <Link href={dashboard()} prefetch>
+                            <Link href={homeHref} prefetch>
                                 <AppLogo />
                             </Link>
                         </SidebarMenuButton>
@@ -72,7 +97,6 @@ export function AppSidebar() {
             </SidebarContent>
 
             <SidebarFooter>
-                <NavFooter items={footerNavItems} className="mt-auto" />
                 <NavUser />
             </SidebarFooter>
         </Sidebar>

@@ -1,17 +1,23 @@
-# Student Conduct Management System
+# Student Conduct Management System (v2.0)
 
-**Web Application for Managing Student Behavior Using Point-Based
-System**
+**Web Application for Managing Student Behavior Using Point-Based System**
 
-Student Conduct Management System adalah aplikasi web modern untuk
-**mengelola perilaku siswa secara digital menggunakan sistem poin**,
-dirancang untuk sekolah, institusi pendidikan, dan penelitian akademik.\
-Aplikasi ini membantu admin mencatat pelanggaran dan prestasi siswa,
-menerapkan aturan poin secara konsisten, serta mengirimkan notifikasi
-otomatis melalui WhatsApp.
+Student Conduct Management System adalah aplikasi web modern untuk **mengelola perilaku siswa secara digital menggunakan sistem poin**, dirancang untuk sekolah, institusi pendidikan, dan manajemen kesiswaan/BK.
 
-> Built with Laravel, React, TypeScript, and Inertia.js --- designed for
-> scalability, clarity, and learning.
+> Built with Laravel 13, Inertia.js v3, React 19, TypeScript, Tailwind CSS v4, and Spatie Laravel Permission.
+
+---
+
+## ✨ What's New in v2.0
+
+- **Framework & Starter Kit Upgrade:** Laravel 13, Inertia.js v3, React 19, Vite 8, Tailwind CSS v4, dan Wayfinder.
+- **3-Role RBAC (`spatie/laravel-permission`):** Pemisahan hak akses tegas untuk `admin`, `staf_bk`, dan `siswa`.
+- **Unified Single Login (`/`):** Halaman root langsung menampilkan form login terpadu (Email untuk Admin/Staf BK, atau NISN untuk Siswa) dengan redirect otomatis sesuai role.
+- **Separated Admin & Staf BK Panels:**
+  - **Admin (`/dashboard`, `/admin/*`):** Manajemen User & Role, Data Induk Siswa (CRUD, aktif/nonaktif, Export CSV), dan Master Aturan Poin.
+  - **Staf BK (`/bk/dashboard`, `/bk/*`):** Dashboard analitik kedisiplinan 30 hari, Monitoring Siswa & Status SP, Input Poin Siswa, dan Riwayat Poin.
+  - **Siswa (`/student/dashboard`):** Kartu Digital Pelajar, sisa poin, status SP, dan riwayat poin pribadi.
+- **Tiered SP & Anti-Spam WhatsApp (Fonnte):** Pelacakan `sp_level` berjenjang (`SP 1 < 75`, `SP 2 < 50`, `SP 3 < 25`) yang hanya mengirim notifikasi WhatsApp saat level SP naik.
 
 ------------------------------------------------------------------------
 
@@ -56,19 +62,19 @@ behavior analytics
 
 ### Backend
 
--   Laravel 12
--   PHP 8+
--   MySQL / MariaDB
+-   Laravel 13
+-   PHP 8.3+
+-   Spatie Laravel Permission (RBAC)
+-   Laravel Fortify (Unified Authentication & 2FA)
 -   Service Layer Architecture
--   Custom Authentication Guard
 
 ### Frontend
 
--   React
+-   React 19
 -   TypeScript
--   Inertia.js
--   Vite
--   Tailwind CSS (shadcn UI)
+-   Inertia.js v3
+-   Vite 8
+-   Tailwind CSS v4 (shadcn UI)
 -   Recharts (Charts)
 
 ### External Services

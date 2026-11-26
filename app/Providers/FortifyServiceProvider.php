@@ -4,12 +4,17 @@ namespace App\Providers;
 
 use App\Actions\Fortify\CreateNewUser;
 use App\Actions\Fortify\ResetUserPassword;
+use App\Models\Student;
+use App\Models\User;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
+use Laravel\Fortify\Contracts\LoginResponse;
+use Laravel\Fortify\Contracts\RegisterResponse;
 use Laravel\Fortify\Features;
 use Laravel\Fortify\Fortify;
 
@@ -40,6 +45,70 @@ class FortifyServiceProvider extends ServiceProvider
     {
         Fortify::resetUserPasswordsUsing(ResetUserPassword::class);
         Fortify::createUsersUsing(CreateNewUser::class);
+
+        Fortify::authenticateUsing(function (Request $request) {
+            $login = trim((string) $request->input(Fortify::username()));
+            $password = (string) $request->input('password');
+
+            $user = User::where('email', $login)->first();
+
+            if (! $user) {
+                $student = Student::where('nisn', $login)
+                    ->where('is_active', true)
+                    ->first();
+                $user = $student?->user;
+            }
+
+            if ($user && Hash::check($password, $user->password)) {
+                if ($user->hasRole('siswa') && $user->student && ! $user->student->is_active) {
+                    return null;
+                }
+
+                return $user;
+            }
+
+            return null;
+        });
+
+        $this->app->singleton(LoginResponse::class, function () {
+            return new class implements LoginResponse
+            {
+                public function toResponse($request)
+                {
+                    $user = $request->user();
+
+                    if ($user?->hasRole('admin')) {
+                        return redirect()->intended('/dashboard');
+                    }
+
+                    if ($user?->hasRole('staf_bk')) {
+                        return redirect()->intended('/bk/dashboard');
+                    }
+
+                    return redirect()->intended('/student/dashboard');
+                }
+            };
+        });
+
+        $this->app->singleton(RegisterResponse::class, function () {
+            return new class implements RegisterResponse
+            {
+                public function toResponse($request)
+                {
+                    $user = $request->user();
+
+                    if ($user?->hasRole('admin')) {
+                        return redirect('/dashboard');
+                    }
+
+                    if ($user?->hasRole('staf_bk')) {
+                        return redirect('/bk/dashboard');
+                    }
+
+                    return redirect('/student/dashboard');
+                }
+            };
+        });
     }
 
     /**

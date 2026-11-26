@@ -7,9 +7,9 @@ use Illuminate\Support\Facades\Log;
 
 class FonnteService
 {
-    protected string $token;
+    protected ?string $token;
 
-    protected string $url;
+    protected ?string $url;
 
     public function __construct()
     {
@@ -19,6 +19,12 @@ class FonnteService
 
     public function send(string $phone, string $message): bool
     {
+        if (empty($this->token) || empty($this->url)) {
+            Log::warning('Fonnte skipped: FONNTE_TOKEN or FONNTE_URL is not configured.');
+
+            return false;
+        }
+
         try {
             $response = Http::withHeaders([
                 'Authorization' => $this->token,

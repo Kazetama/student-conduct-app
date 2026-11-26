@@ -26,7 +26,7 @@ class PointRuleRequest extends FormRequest
             'nama' => 'required|string|max:255',
             'type' => 'required|in:reward,penalty',
             'kategori' => 'required|in:ringan,sedang,berat,semester',
-            'point' => 'required|integer',
+            'point' => 'required|integer|min:1',
             'max_per_period' => 'nullable|integer|min:1',
             'is_active' => 'boolean',
         ];

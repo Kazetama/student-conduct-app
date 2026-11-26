@@ -21,7 +21,8 @@ import {
     AlertTriangle,
     Siren,
     BookOpen,
-    CreditCard
+    CreditCard,
+    History,
 } from 'lucide-react';
 
 type Student = {
@@ -33,18 +34,55 @@ type Student = {
     rombel: string;
     tahun_ajaran: string;
     total_poin: number;
+    sp_level?: number;
     is_active: boolean;
 };
 
-type Props = {
-    student: Student;
+type PointHistory = {
+    id: number;
+    point: number;
+    tanggal: string;
+    keterangan?: string | null;
+    point_rule?: {
+        id: number;
+        nama: string;
+        type: 'reward' | 'penalty';
+        kategori: string;
+    } | null;
 };
 
-export default function Dashboard({ student }: Props) {
+type Props = {
+    student: Student | null;
+    pointHistories?: PointHistory[];
+};
+
+export default function Dashboard({ student, pointHistories = [] }: Props) {
 
     // --- Logic Helper ---
     function logout() {
-        router.post('/student/logout');
+        router.post('/logout');
+    }
+
+    if (!student) {
+        return (
+            <div className="min-h-screen bg-gray-50/50 flex items-center justify-center p-4">
+                <Head title="Dashboard Siswa" />
+                <Card className="max-w-md w-full">
+                    <CardHeader>
+                        <CardTitle>Profil Siswa Belum Terhubung</CardTitle>
+                        <CardDescription>
+                            Akun Anda memiliki role Siswa, namun belum terhubung ke data siswa. Hubungi Administrator sekolah.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardFooter>
+                        <Button variant="destructive" onClick={logout} className="w-full">
+                            <LogOut className="mr-2 h-4 w-4" />
+                            Keluar
+                        </Button>
+                    </CardFooter>
+                </Card>
+            </div>
+        );
     }
 
     const getInitials = (name: string) => {
@@ -255,6 +293,59 @@ export default function Dashboard({ student }: Props) {
                     </Card>
 
                 </div>
+
+                {/* === RIWAYAT POIN SISWA === */}
+                <Card className="shadow-md">
+                    <CardHeader className="border-b bg-muted/10 flex flex-row items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <History className="h-5 w-5 text-primary" />
+                            <CardTitle className="text-lg">Riwayat Poin Kedisiplinan</CardTitle>
+                        </div>
+                        {student.sp_level && student.sp_level > 0 ? (
+                            <Badge variant="destructive">Status: SP {student.sp_level}</Badge>
+                        ) : (
+                            <Badge variant="outline" className="border-green-200 bg-green-50 text-green-700">
+                                Tidak Ada SP
+                            </Badge>
+                        )}
+                    </CardHeader>
+                    <CardContent className="p-0">
+                        {pointHistories.length === 0 ? (
+                            <div className="py-10 text-center text-sm text-muted-foreground">
+                                Belum ada catatan pelanggaran maupun prestasi. Pertahankan kedisiplinan Anda!
+                            </div>
+                        ) : (
+                            <div className="divide-y">
+                                {pointHistories.map((item) => {
+                                    const isPenalty = item.point < 0;
+                                    return (
+                                        <div key={item.id} className="flex items-center justify-between gap-4 px-6 py-4">
+                                            <div className="space-y-0.5">
+                                                <p className="font-medium text-sm text-gray-900">
+                                                    {item.point_rule?.nama ?? 'Catatan Poin'}
+                                                </p>
+                                                <p className="text-xs text-muted-foreground">
+                                                    {formatDate(item.tanggal)}
+                                                    {item.keterangan ? ` • ${item.keterangan}` : ''}
+                                                </p>
+                                            </div>
+                                            <Badge
+                                                variant="outline"
+                                                className={
+                                                    isPenalty
+                                                        ? 'border-red-200 bg-red-50 text-red-700'
+                                                        : 'border-green-200 bg-green-50 text-green-700'
+                                                }
+                                            >
+                                                {item.point > 0 ? '+' : ''}{item.point} Poin
+                                            </Badge>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
+                    </CardContent>
+                </Card>
 
                 {/* === FOOTER INFO === */}
                 <div className="text-center text-sm text-muted-foreground pt-8 pb-4">

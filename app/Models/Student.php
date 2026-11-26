@@ -3,16 +3,16 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Model;
 
-class Student extends Authenticatable
+class Student extends Model
 {
-    use HasFactory, Notifiable;
+    use HasFactory;
 
     protected $table = 'students';
 
     protected $fillable = [
+        'user_id',
         'nama_lengkap',
         'nisn',
         'jenis_kelamin',
@@ -22,6 +22,7 @@ class Student extends Authenticatable
         'tahun_ajaran',
         'no_hp',
         'total_poin',
+        'sp_level',
         'is_active',
     ];
 
@@ -29,19 +30,12 @@ class Student extends Authenticatable
         'tanggal_lahir' => 'date',
         'is_active' => 'boolean',
         'total_poin' => 'integer',
+        'sp_level' => 'integer',
     ];
 
-    protected $hidden = [
-        'remember_token',
-    ];
-
-    /**
-     * Student TIDAK pakai password
-     * Method ini WAJIB agar Auth Laravel tidak error
-     */
-    public function getAuthPassword()
+    public function user()
     {
-        return null;
+        return $this->belongsTo(User::class);
     }
 
     public function studentPoints()

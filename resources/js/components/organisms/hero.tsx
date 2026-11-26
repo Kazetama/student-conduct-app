@@ -38,15 +38,10 @@ export default function HeroModern() {
                                 Sistem informasi sekolah untuk mencatat, memantau, dan mengevaluasi perilaku siswa berdasarkan aturan dan poin yang ditetapkan sekolah.
                             </p>
                             <div className="flex flex-col sm:flex-row gap-4 pt-2">
-                                <Link href="/student/login">
+                                <Link href="/login">
                                     <Button size="lg" className="h-12 px-8 text-base rounded-lg bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-500/20 transition-all hover:scale-105 active:scale-95 w-full sm:w-auto">
-                                        Masuk Dashboard
+                                        Masuk Sistem
                                         <ArrowRight className="ml-2 h-4 w-4" />
-                                    </Button>
-                                </Link>
-                                <Link href="/demo">
-                                    <Button variant="outline" size="lg" className="h-12 px-8 text-base rounded-lg border-2 hover:bg-muted/50 transition-all hover:scale-105 active:scale-95 w-full sm:w-auto">
-                                        Lihat Alur Sistem
                                     </Button>
                                 </Link>
                             </div>

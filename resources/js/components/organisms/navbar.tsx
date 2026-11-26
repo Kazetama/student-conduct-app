@@ -28,6 +28,12 @@ import {
 
 export default function Navbar() {
     const { auth } = usePage<SharedData>().props;
+    const roles = auth.roles ?? [];
+    const dashboardHref = roles.includes('admin')
+        ? '/dashboard'
+        : roles.includes('staf_bk')
+          ? '/bk/dashboard'
+          : '/student/dashboard';
     const [isOpen, setIsOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
 
@@ -88,29 +94,19 @@ export default function Navbar() {
 
                     <div className="hidden lg:flex lg:flex-1 lg:justify-end lg:gap-x-3 items-center">
                         {auth.user ? (
-                            <Link href="/dashboard">
+                            <Link href={dashboardHref}>
                                 <Button size="sm" className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-500/20 rounded-lg font-medium">
                                     <LayoutDashboard className="mr-2 h-4 w-4" />
                                     Dashboard
                                 </Button>
                             </Link>
                         ) : (
-                            <>
-                                <Link href="/student/login">
-                                    <Button variant="ghost" size="sm" className="font-medium text-muted-foreground hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20">
-                                        Portal Siswa
-                                    </Button>
-                                </Link>
-
-                                <div className="h-4 w-px bg-border/60" aria-hidden="true" />
-
-                                <Link href="/login">
-                                    <Button size="sm" className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-500/20 rounded-lg px-5 font-medium transition-all hover:-translate-y-0.5">
-                                        Login Staff
-                                        <LogIn className="ml-2 h-3.5 w-3.5" />
-                                    </Button>
-                                </Link>
-                            </>
+                            <Link href="/login">
+                                <Button size="sm" className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-500/20 rounded-lg px-5 font-medium transition-all hover:-translate-y-0.5">
+                                    Masuk Sistem
+                                    <LogIn className="ml-2 h-3.5 w-3.5" />
+                                </Button>
+                            </Link>
                         )}
                     </div>
 
@@ -150,20 +146,17 @@ export default function Navbar() {
                                                     <Home className="h-4 w-4" />
                                                     Beranda
                                                 </Link>
-                                                <button className="w-full flex items-center justify-between px-3 py-3 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-all group">
+                                                <Link
+                                                    href="/login"
+                                                    onClick={() => setIsOpen(false)}
+                                                    className="flex items-center justify-between px-3 py-3 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-all group"
+                                                >
                                                     <div className="flex items-center gap-3">
-                                                        <Layers className="h-4 w-4" />
-                                                        <span>Fitur Sekolah</span>
+                                                        <LogIn className="h-4 w-4" />
+                                                        <span>Masuk Sistem</span>
                                                     </div>
                                                     <ChevronRight className="h-3 w-3 opacity-50 group-hover:translate-x-1 transition-transform" />
-                                                </button>
-
-                                                <button className="w-full flex items-center justify-between px-3 py-3 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-all group">
-                                                    <div className="flex items-center gap-3">
-                                                        <LifeBuoy className="h-4 w-4" />
-                                                        <span>Bantuan & Support</span>
-                                                    </div>
-                                                </button>
+                                                </Link>
                                             </div>
                                         </div>
                                     </div>
@@ -180,7 +173,7 @@ export default function Navbar() {
                                                     </div>
                                                 </div>
                                                 <div className="grid grid-cols-2 gap-2">
-                                                    <Link href="/dashboard" onClick={() => setIsOpen(false)}>
+                                                    <Link href={dashboardHref} onClick={() => setIsOpen(false)}>
                                                         <Button size="sm" className="w-full bg-indigo-600 hover:bg-indigo-700 text-xs h-9">
                                                             Dashboard
                                                         </Button>
@@ -196,21 +189,12 @@ export default function Navbar() {
                                         ) : (
                                             <div className="space-y-3">
                                                 <p className="text-xs font-semibold text-muted-foreground uppercase text-center">Akses Sistem</p>
-                                                <div className="grid gap-2">
-                                                    <Link href="/student/login" onClick={() => setIsOpen(false)}>
-                                                        <Button variant="outline" className="w-full h-11 justify-start relative overflow-hidden group border-indigo-200 hover:border-indigo-400 hover:bg-indigo-50 text-indigo-700">
-                                                            <div className="absolute inset-0 bg-indigo-100/50 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
-                                                            <GraduationCap className="mr-3 h-4 w-4 relative z-10" />
-                                                            <span className="relative z-10 font-medium">Masuk Portal Siswa</span>
-                                                        </Button>
-                                                    </Link>
-                                                    <Link href="/login" onClick={() => setIsOpen(false)}>
-                                                        <Button className="w-full h-11 justify-start bg-indigo-600 hover:bg-indigo-700 shadow-md shadow-indigo-500/20">
-                                                            <Users className="mr-3 h-4 w-4" />
-                                                            <span className="font-medium">Login Guru / Staff</span>
-                                                        </Button>
-                                                    </Link>
-                                                </div>
+                                                <Link href="/login" onClick={() => setIsOpen(false)}>
+                                                    <Button className="w-full h-11 justify-center bg-indigo-600 hover:bg-indigo-700 shadow-md shadow-indigo-500/20">
+                                                        <LogIn className="mr-2 h-4 w-4" />
+                                                        <span className="font-medium">Masuk Sistem</span>
+                                                    </Button>
+                                                </Link>
                                             </div>
                                         )}
                                     </div>
